@@ -1,0 +1,9 @@
+:root {
+  --foo-width: block;
+  --foo-bg-color: rgba(255, 0, 0, 0.85);
+}
+
+body {
+
+  display: var(--foo-width);
+}
