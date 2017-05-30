@@ -1,5 +1,5 @@
 <template>
-  <div class="ui modal">
+  <div class="ui modal" :id="id">
     <i class="close icon"></i>
     <div class="header">
       <slot name="header"></slot>
@@ -13,17 +13,22 @@
 <script>
 import $ from 'jquery'
 import 'semantic-ui-js'
+import _ from 'underscore'
 
 export default {
   name: 'popup',
+  data () {
+    return {
+      id: _.uniqueId('modal_')
+    }
+  },
   mounted () {
-    const el = $('.ui.modal').modal({
+    const el = $('#' + this.id).modal({
       onHide: () => {
         this.$parent.$emit('hide-task-form')
       }
     })
     this.$parent.$on('toggle-task-form', (active) => {
-      console.log('par')
       let event = 'show'
       if (!active) {
         event = 'hide'

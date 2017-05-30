@@ -1,22 +1,32 @@
 <template>
 
   <div>
-    <popup :active="active">
+    <popup>
       <div slot="header">Create task</div>
       <div slot="content">
         <form class="ui form">
-          <div class="field" :class="{'error': isSubmitForm && errors.has('title') }">
+          <div class="field" :class="{'error': isSubmitForm && errors.has('model.title') }">
             <label for="title">Title</label>
-            <input id="title" type="text" v-model="title" v-validate.initial="title" data-vv-rules="required|alpha|min:3|max:25" name="title" placeholder="Task title">
-            <div class="ui error message" v-if="isSubmitForm && errors.has('title')">
-              <p>{{ errors.first('title') }}</p>
+            <div v-if="isEdit">
+              <input id="title" type="text" v-model="model.title" v-validate.initial="model.title" data-vv-rules="required|alpha|min:3|max:25" name="title" placeholder="Task title">
+              <div class="ui error message" v-if="isSubmitForm && errors.has('model.title')">
+                <p>{{ errors.first('model.title') }}</p>
+              </div>
+            </div>
+            <div v-if="!isEdit">
+              {{model.title}}
             </div>
           </div>
-          <div class="field" :class="{'error': isSubmitForm && errors.has('description') }">
+          <div class="field" :class="{'error': isSubmitForm && errors.has('model.description') }">
             <label for="description">Description</label>
-            <input id="description" type="text" v-model="description" v-validate.initial="description" data-vv-rules="required|alpha|min:3|max:50" name="description" placeholder="Task description">
-            <div class="ui error message" v-if="isSubmitForm && errors.has('description')">
-              <p>{{ errors.first('description') }}</p>
+            <div v-if="isEdit">
+              <input id="description" type="text" v-model="model.description" v-validate.initial="model.description" data-vv-rules="required|alpha|min:3|max:50" name="description" placeholder="Task description">
+              <div class="ui error message" v-if="isSubmitForm && errors.has('model.description')">
+                <p>{{ errors.first('model.description') }}</p>
+              </div>
+            </div>
+            <div v-if="!isEdit">
+              {{model.description}}
             </div>
           </div>
           <div class="field">
@@ -29,12 +39,11 @@
           </div>
 
           <div class="buttons">
-            <div class="ui button" @click="create">
-              Create
-            </div>
-            <div class="ui button">
-              Cancel
-            </div>
+            <div class="ui button" @click="update" v-if="isEditFormType && isEdit">Update</div>
+            <div class="ui button" @click="isEdit = true" v-if="isEditFormType && !isEdit">Edit</div>
+            <div class="ui button" @click="create" v-if="!isEditFormType">Create</div>
+            <div class="ui button" @click="remove" v-if="isEditFormType && !isEdit">Delete</div>
+            <div class="ui button" @click="hidePopup">Cancel</div>
           </div>
 
         </form>
@@ -49,8 +58,8 @@
 import Popup from '../components/common/Popup.vue'
 import { mapMutations } from 'vuex'
 import Vue from 'vue'
-import { TASK_STATUS } from '../enum/Task'
 import VeeValidate from 'vee-validate' // https://github.com/hootlex/vuejs-form-validation-example/blob/master/src/App.vue
+import _ from 'underscore'
 
 Vue.use(VeeValidate)
 
@@ -59,35 +68,39 @@ export default {
   components: {
     Popup
   },
-  props: ['active'],
+  props: ['task'],
   data () {
     return {
-      title: '',
-      description: '',
-      isSubmitForm: false
-    }
-  },
-  watch: {
-    active () {
-      this.showPopup()
+      model: {},
+      isSubmitForm: false,
+      isEditFormType: false,
+      isEdit: true
     }
   },
   methods: {
     ...mapMutations([
-      'addTask'
+      'createTask',
+      'updateTask',
+      'deleteTask'
     ]),
     create () {
-      this.isSubmitForm = true
       if (this.isFormValid()) {
-        this.$store.commit('addTask', {
-          id: Math.random(),
-          title: this.title,
-          description: this.description,
-          status: TASK_STATUS.TODO
-        })
+        this.createTask(this.model)
+        this.hidePopup()
       }
     },
+    update () {
+      if (this.isFormValid()) {
+        this.updateTask(this.model)
+        this.isEdit = false
+      }
+    },
+    remove () {
+      this.deleteTask(this.model)
+      this.hidePopup()
+    },
     isFormValid () {
+      this.isSubmitForm = true
       this.$validator.validateAll()
       return !this.errors.any()
     },
@@ -99,8 +112,18 @@ export default {
     }
   },
   created () {
-    this.$on('hide-task-form', (value) => {
-      console.log('event', value)
+    this.$parent.$on('toggle-task-form', (value) => {
+      if (value) {
+        if (this.task) {
+          this.model = _.clone(this.task) || {}
+          this.isEditFormType = true
+          this.isEdit = false
+        } else {
+          this.isSubmitForm = false
+          this.model = {}
+        }
+        this.$emit('toggle-task-form', true)
+      }
     })
   }
 }

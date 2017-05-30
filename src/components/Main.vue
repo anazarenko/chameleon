@@ -16,16 +16,15 @@
             <div class="ui segment">
               <p>To Do</p>
             </div>
-                <div class="ui secondary segment">
-                  <draggable v-model="toDoList" class="dragArea" :options="{group:'list'}">
+            <div class="ui secondary segment">
+              <draggable v-model="toDoList" class="dragArea" :options="{group:'list'}">
 
-                      <div class="ui stacked segment" v-for="element in toDoList">
-                        <h4 class="header">{{element.title}}</h4>
-                        <p>{{element.description}}</p>
-                      </div>
+                  <div class="ui stacked segment" v-for="task in toDoList">
+                    <task :task="task"></task>
+                  </div>
 
-                  </draggable>
-                </div>
+              </draggable>
+            </div>
           </div>
 
         </div>
@@ -39,12 +38,9 @@
               <div class="ui secondary segment">
                 <draggable v-model="inProgressList" class="dragArea" :options="{group:'list'}">
 
-                    <hr>
-
-                    <div class="ui stacked segment" v-for="element in inProgressList">
-                      <h4 class="header">{{element.title}}</h4>
-                      <p>{{element.description}}</p>
-                    </div>
+                  <div class="ui stacked segment" v-for="task in inProgressList">
+                    <task :task="task"></task>
+                  </div>
 
                 </draggable>
               </div>
@@ -59,7 +55,15 @@
               <p>Delivered</p>
             </div>
             <div class="ui secondary segment">
-              <p>Secondary Content</p>
+
+              <draggable v-model="doneList" class="dragArea" :options="{group:'list'}">
+
+                <div class="ui stacked segment" v-for="task in doneList">
+                  <task :task="task"></task>
+                </div>
+
+              </draggable>
+
             </div>
           </div>
 
@@ -67,7 +71,7 @@
       </div>
     </div>
 
-    <task-form :active="activePopup"></task-form>
+    <task-form></task-form>
 
   </div>
 
@@ -78,19 +82,17 @@
 import draggable from 'vuedraggable' // https://github.com/SortableJS/Vue.Draggable
 import Popup from '../components/common/Popup.vue'
 import TaskForm from '../components/TaskForm.vue'
-import { TASK_STATUS } from '../enum/Task'
+import Task from '../components/Task.vue'
 import { mapMutations } from 'vuex'
 
-const computedAccessor = function (status) {
+const computedAccessor = function (listName) {
   return {
     get () {
-      return this.$store.state.list.filter((task) => status === task.status)
+      return this.$store.state.tasks[listName]
+        .filter((task) => task)
     },
-    set (value) {
-      let task = value[0]
-      task.status = status
-      this.updateTask(task)
-      console.log(task, status)
+    set (list) {
+      this.replaceList({list, name: listName})
     }
   }
 }
@@ -100,26 +102,26 @@ const MainComponent = {
   components: {
     draggable,
     Popup,
+    Task,
     TaskForm
   },
   computed: {
-    toDoList: computedAccessor.call(MainComponent, TASK_STATUS.TODO),
-    inProgressList: computedAccessor.call(MainComponent, TASK_STATUS.IN_PROGRESS)
+    toDoList: computedAccessor.call(MainComponent, 'toDoList'),
+    inProgressList: computedAccessor.call(MainComponent, 'inProgressList'),
+    doneList: computedAccessor.call(MainComponent, 'doneList')
   },
   data () {
     return {
-      list2: [{
-        name: 'Ruslan'
-      }],
       activePopup: false
     }
   },
   methods: {
     ...mapMutations([
-      'updateTask'
+      'updateTask',
+      'replaceList'
     ]),
     showCreatePopup () {
-      this.activePopup = !this.activePopup
+      this.$emit('toggle-task-form', true)
     }
   }
 }
@@ -130,6 +132,10 @@ export default MainComponent
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.dragArea {
+  min-height: 200px;
+}
+
 h1, h2 {
   font-weight: normal;
 }
