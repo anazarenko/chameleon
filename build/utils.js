@@ -58,7 +58,9 @@ exports.cssLoaders = function (options) {
 
 // Generate loaders for standalone style files (outside of .vue)
 exports.styleLoaders = function (options) {
-  var output = []
+  var output = [
+    { test: require.resolve('jquery'), loader: 'expose-loader?jQuery!expose-loader?$!expose-loader?jquery' }
+  ]
   var loaders = exports.cssLoaders(options)
   for (var extension in loaders) {
     var loader = loaders[extension]

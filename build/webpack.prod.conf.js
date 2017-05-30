@@ -32,7 +32,7 @@ var webpackConfig = merge(baseWebpackConfig, {
       'process.env': env,
       $: 'jquery',
       jQuery: 'jquery',
-      'window.jQuery': 'jquery',
+      'jquery': 'jquery',
       'semantic-ui': 'semantic-ui-css'
     }),
     new webpack.optimize.UglifyJsPlugin({

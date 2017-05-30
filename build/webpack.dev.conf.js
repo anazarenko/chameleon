@@ -22,7 +22,7 @@ module.exports = merge(baseWebpackConfig, {
       'process.env': config.dev.env,
       $: 'jquery',
       jQuery: 'jquery',
-      'window.jQuery': 'jquery',
+      'jquery': 'jquery',
       'semantic-ui': 'semantic-ui-css'
     }),
     // https://github.com/glenjamin/webpack-hot-middleware#installation--usage

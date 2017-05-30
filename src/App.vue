@@ -1,13 +1,19 @@
 <template>
   <div id="app">
-    <img src="./assets/logo.png">
     <router-view></router-view>
   </div>
 </template>
 
 <script>
+import Popup from './components/common/Popup.vue'
+import store from './store'
+
 export default {
-  name: 'app'
+  store,
+  name: 'app',
+  components: {
+    Popup
+  }
 }
 </script>
 
