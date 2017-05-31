@@ -71,6 +71,7 @@
       </div>
     </div>
 
+
     <task-form></task-form>
 
   </div>
@@ -84,6 +85,7 @@ import Popup from '../components/common/Popup.vue'
 import TaskForm from '../components/TaskForm.vue'
 import Task from '../components/Task.vue'
 import { mapMutations } from 'vuex'
+import GoogleMap from './common/GoogleMap.vue'
 
 const computedAccessor = function (listName) {
   return {
@@ -103,7 +105,8 @@ const MainComponent = {
     draggable,
     Popup,
     Task,
-    TaskForm
+    TaskForm,
+    GoogleMap
   },
   computed: {
     toDoList: computedAccessor.call(MainComponent, 'toDoList'),

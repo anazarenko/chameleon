@@ -24,6 +24,7 @@ module.exports = {
       'vue$': 'vue/dist/vue.esm.js',
       '@': resolve('src'),
       'semantic-ui-js': path.resolve(__dirname, '../node_modules/semantic-ui-css/semantic.min.js'),
+      'semantic-ui-calendar': path.resolve(__dirname, '../node_modules/semantic-ui-calendar/dist/calendar.js')
     }
   },
   module: {
