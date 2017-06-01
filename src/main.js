@@ -20,3 +20,6 @@ new Vue({
   template: '<App/>',
   components: { App }
 })
+
+// Redraw map when resize
+// Stylize all

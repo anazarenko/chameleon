@@ -8,12 +8,13 @@
 </template>
 
 <script>
-// import $ from 'jquery'
+import $ from 'jquery'
 import GoogleMapsLoader from 'google-maps'
 import _ from 'underscore'
+import Config from '../../config'
 
 GoogleMapsLoader.LIBRARIES = ['places']
-GoogleMapsLoader.KEY = 'AIzaSyDUdN7NVRGJemyHZSmjFdUcsjy1siE_sa4'
+GoogleMapsLoader.KEY = Config.googleApiKey
 GoogleMapsLoader.LANGUAGE = 'en'
 GoogleMapsLoader.REGION = 'GB'
 
@@ -28,6 +29,11 @@ const drawMap = function (value, mapId, searchId, cb) {
       zoom: 13,
       mapTypeId: 'roadmap'
     })
+
+    drawMap.resize = function () {
+      $(window).resize()
+      google.maps.event.trigger(map, 'resize')
+    }
 
     let marker = new google.maps.Marker({
       position: location,
@@ -50,7 +56,6 @@ const drawMap = function (value, mapId, searchId, cb) {
     })
 
     let searchBox = new google.maps.places.SearchBox(input)
-//    map.controls[google.maps.ControlPosition.TOP_LEFT].push(input)
 
     searchBox.addListener('places_changed', () => {
       let places = searchBox.getPlaces()
@@ -58,8 +63,6 @@ const drawMap = function (value, mapId, searchId, cb) {
       if (places.length === 0) {
         return
       }
-
-      console.log(places)
 
       let place = places[0]
       if (!place.geometry) {
@@ -69,18 +72,12 @@ const drawMap = function (value, mapId, searchId, cb) {
       map.setCenter(place.geometry.location)
       cb(place.formatted_address, place.geometry.location)
     })
-
-//      setInterval(() => {
-//        google.maps.event.trigger(map, 'resize')
-//        $(window).resize()
-//        console.log('hello')
-//      }, 2000)
   })
 }
 
 export default {
   name: 'google-map',
-  props: ['value', 'isEdit'],
+  props: ['value', 'isEdit', 'resize'],
   data () {
     return {
       mapId: _.uniqueId('google-map-map-id_'),
@@ -93,6 +90,13 @@ export default {
         this.$nextTick(() => {
           drawMap(value, this.mapId, this.searchId, this.updateValue.bind(this))
         })
+      }
+    },
+    resize () {
+      if (drawMap.resize) {
+        setTimeout(() => {
+          drawMap.resize() // Resize google map after modal was showing, wrong with semantic ui modal
+        }, 1000)
       }
     }
   },

@@ -26,7 +26,7 @@
               <div class="field" :class="{'error': isSubmitForm && errors.has('model.description') }">
                 <label for="description">Description</label>
                 <div v-if="isEdit">
-                  <textarea id="description" v-model="model.description" v-validate.initial="model.description" data-vv-rules="required|alpha|min:3|max:50" name="description" placeholder="Task description"></textarea>
+                  <textarea id="description" v-model="model.description" v-validate.initial="model.description" data-vv-rules="required|min:3|max:50" name="description" placeholder="Task description"></textarea>
                   <div class="ui error message" v-if="isSubmitForm && errors.has('model.description')">
                     <p>{{ errors.first('model.description') }}</p>
                   </div>
@@ -60,7 +60,7 @@
                 <div class="ui error message" v-if="isSubmitForm && !modelAddress">
                   <p>Address should not be empty</p>
                 </div>
-                <google-map v-model="model.address" data-vv-rules="required" :isEdit="isEdit"></google-map>
+                <google-map v-model="model.address" data-vv-rules="required" :resize="resize" :isEdit="isEdit"></google-map>
               </div>
             </div>
           </div>
@@ -117,7 +117,8 @@ export default {
       disabledDates: {
         to: new Date(today.getFullYear(), today.getMonth(), today.getDate()),
         from: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 14)
-      }
+      },
+      resize: false
     }
   },
   methods: {
@@ -128,8 +129,11 @@ export default {
     ]),
     create () {
       if (this.isFormValid()) {
-        this.createTask(this.model)
-        this.hidePopup()
+        WeatherManager.getWeather(this.model.address.location, this.dateObject(), (weather) => {
+          this.model.weather = weather
+          this.createTask(this.model)
+          this.hidePopup()
+        })
       }
     },
     update () {
@@ -152,9 +156,14 @@ export default {
     },
     showPopup () {
       this.$emit('toggle-task-form', true)
+      this.resizeMap()
     },
     hidePopup () {
       this.$emit('toggle-task-form', false)
+      this.resizeMap()
+    },
+    resizeMap () {
+      this.resize = !this.resize
     },
     dateObject () {
       return moment(this.model.date).toDate()
@@ -162,6 +171,7 @@ export default {
   },
   created () {
     this.$parent.$on('toggle-task-form', (value) => {
+      this.resizeMap()
       if (value) {
         if (this.task) {
           this.model = _.clone(this.task) || {}

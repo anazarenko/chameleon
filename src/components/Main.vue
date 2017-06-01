@@ -19,7 +19,7 @@
             <div class="ui secondary segment">
               <draggable v-model="toDoList" class="dragArea" :options="{group:'list'}">
 
-                  <div class="ui stacked segment" v-for="task in toDoList">
+                  <div class="segment" v-for="task in toDoList">
                     <task :task="task"></task>
                   </div>
 
@@ -38,7 +38,7 @@
               <div class="ui secondary segment">
                 <draggable v-model="inProgressList" class="dragArea" :options="{group:'list'}">
 
-                  <div class="ui stacked segment" v-for="task in inProgressList">
+                  <div class="segment" v-for="task in inProgressList">
                     <task :task="task"></task>
                   </div>
 
@@ -58,7 +58,7 @@
 
               <draggable v-model="doneList" class="dragArea" :options="{group:'list'}">
 
-                <div class="ui stacked segment" v-for="task in doneList">
+                <div class="segment" v-for="task in doneList">
                   <task :task="task"></task>
                 </div>
 
@@ -136,7 +136,7 @@ export default MainComponent
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .dragArea {
-  min-height: 200px;
+  min-height: 50px;
 }
 
 h1, h2 {
@@ -155,5 +155,16 @@ li {
 
 a {
   color: #42b983;
+}
+
+.segment {
+  margin-bottom: 15px;
+  border: 1px solid #d4c9c9;
+  border-radius: 3px;
+  position: relative;
+  overflow: hidden;
+}
+div .segment:last-child {
+  margin-bottom: 0;
 }
 </style>
