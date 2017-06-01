@@ -26,7 +26,7 @@
               <div class="field" :class="{'error': isSubmitForm && errors.has('model.description') }">
                 <label for="description">Description</label>
                 <div v-if="isEdit">
-                  <textarea id="description" v-model="model.description" v-validate.initial="model.description" data-vv-rules="required|min:3|max:50" name="description" placeholder="Task description"></textarea>
+                  <textarea id="description" v-model="model.description" v-validate.initial="model.description" data-vv-rules="required|min:3|max:70" name="description" placeholder="Task description"></textarea>
                   <div class="ui error message" v-if="isSubmitForm && errors.has('model.description')">
                     <p>{{ errors.first('model.description') }}</p>
                   </div>
@@ -35,8 +35,11 @@
                   {{model.description}}
                 </div>
               </div>
-              <div>
-                {{model.weather}}
+              <div class="field" v-if="isEditFormType && !isEdit && model.weather && weatherTitle()">
+                <label>Weather</label>
+                <div>
+                  {{ weatherTitle() }} ({{ weatherInfo() }})
+                </div>
               </div>
             </div>
 
@@ -127,6 +130,16 @@ export default {
       'updateTask',
       'deleteTask'
     ]),
+    weatherInfo () {
+      if (this.model.weather) {
+        return this.task.weather.weather[0].description
+      }
+    },
+    weatherTitle () {
+      if (this.model.weather) {
+        return this.task.weather.weather[0].main
+      }
+    },
     create () {
       if (this.isFormValid()) {
         WeatherManager.getWeather(this.model.address.location, this.dateObject(), (weather) => {

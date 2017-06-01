@@ -24,7 +24,7 @@ export default {
   width: 50px;
   height: 50px;
   position: absolute;
-  top: 10px;
-  right: 20px;
+  top: 5px;
+  right: 5px;
 }
 </style>

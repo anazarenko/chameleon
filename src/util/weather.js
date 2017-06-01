@@ -5,7 +5,9 @@ export default {
   apiKey: Config.apiKey,
   route: Config.route,
   getWeather (location, date, cb) {
-    let route = window.location.protocol === 'http' ? this.route : this.route.replace(/http:/, 'https:')
+    // User https protocol for appropriate host
+    // let route = window.location.protocol.match(/https/) ? this.route.replace(/http:/, 'https:') : this.route
+    let route = this.route
     let lat = typeof location.lat === 'function' ? location.lat() : location.lat
     let lon = typeof location.lng === 'function' ? location.lng() : location.lng
     Vue.http.get(`${route}?lat=${lat}&lon=${lon}&cnt=14&appid=${this.apiKey}`)

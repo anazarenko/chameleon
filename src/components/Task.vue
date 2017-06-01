@@ -1,10 +1,18 @@
 <template>
 
-  <div @click="show">
+  <div @click="show" class="task">
     <weather-image v-if="isWeatherExists" :type="weatherType"></weather-image>
-    <google-map-image v-if="isGoogleAddressExists" :address="googleAddress" :height="300" :width="300" :zoom="12"></google-map-image>
-    <h4 class="header">{{ task.title }}</h4>
-    <p>{{ task.description }}</p>
+    <google-map-image v-if="isGoogleAddressExists" :address="googleAddress" :height="400" :width="400" :zoom="12"></google-map-image>
+    <div class="content-container">
+      <h4 class="header">{{ task.title }}</h4>
+      <p class="description">
+      <div class="info">
+        <div class="weather">{{ weatherTitle }} ({{ weatherInfo }})</div>
+        <div class="date">{{ date }}</div>
+      </div>
+      <div class="description">{{ task.description }}</div>
+      </p>
+    </div>
 
     <task-form :task="task"></task-form>
   </div>
@@ -12,6 +20,7 @@
 </template>
 
 <script>
+import moment from 'moment'
 import TaskForm from './TaskForm.vue'
 import WeatherImage from './common/WeatherImage.vue'
 import GoogleMapImage from './common/GoogleMapImage.vue'
@@ -25,6 +34,21 @@ export default {
   },
   props: ['task'],
   computed: {
+    date () {
+      if (this.task.date) {
+        return moment(this.task.date).format('DD/MM/YYYY')
+      }
+    },
+    weatherTitle () {
+      if (this.isWeatherExists) {
+        return this.task.weather.weather[0].main
+      }
+    },
+    weatherInfo () {
+      if (this.isWeatherExists) {
+        return this.task.weather.weather[0].description
+      }
+    },
     weatherType () {
       if (this.isWeatherExists) {
         return this.task.weather.weather[0].icon
@@ -32,7 +56,9 @@ export default {
     },
     googleAddress () {
       if (this.isGoogleAddressExists) {
-        return this.task.address.name
+        let lat = typeof this.task.address.location.lat === 'function' ? this.task.address.location.lat() : this.task.address.location.lat
+        let lng = typeof this.task.address.location.lng === 'function' ? this.task.address.location.lng() : this.task.address.location.lng
+        return `${lat}, ${lng}`
       }
     },
     isWeatherExists () {
@@ -55,5 +81,28 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
+  .info {
+    margin-top: -5px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .date {
+    font-size: 14px
+  }
+  .header {
+    text-align: left;
+    font-size: 18px;
+  }
+  .content-container {
+    padding: 15px;
+    text-align: left;
+  }
+  .description {
+    margin-top: 10px;
+  }
+  .task {
+    cursor: pointer;
+  }
 </style>
